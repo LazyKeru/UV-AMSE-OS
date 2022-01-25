@@ -3,7 +3,7 @@
 ## Compile FiltrePremierOrdre:
 
 ```
-gcc ./src/FiltrePremierOrdre.c -lm -o ./bin/FiltrePremierOrdre
+gcc ./src/FiltrePremierOrdre.c -o ./bin/FiltrePremierOrdre
 ```
 
 ## Run FiltrePremierOrdre :
@@ -23,7 +23,7 @@ example
 ## Compile WaveGenerator:
 
 ```
-gcc ./src/WaveGenerator.c -o ./bin/WaveGenerator
+gcc ./src/WaveGenerator.c -lm -o ./bin/WaveGenerator
 ```
 
 ## Run WaveGenerator :
