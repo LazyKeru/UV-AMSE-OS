@@ -8,3 +8,8 @@ Introduction to operating system (OS)
     - `$ -L`: list of signals managed by the system
     - `$ kill -s <nom du signal> <PID du processus cible>`
 
+## Fonctions pour gerer des zones de memoire partagée "POSIX";
+- shm_open -> 
+- mmap ->
+- shm_unlink ->
+
