@@ -1,5 +1,7 @@
 # Application "Projet" controle d'un robot mobile 
 
+## Text overview
+
 ```
  teta(k)                                       ---
  ---       --- consigne vitesse               | o |
@@ -13,10 +15,15 @@
 |   |     | i |    --------------------       | e |
  ---       ---                                 ---
 ```
+
 - Reg : régime
 - Mot : moteur
 - Rr : rayon roue
 - Cinemati : Cinematique
+
+## Image overview
+
+![Project Image Overview](./doc/img/overview.png?raw=true "Project")
 
 ## Struct :
 - ./bin : executable
