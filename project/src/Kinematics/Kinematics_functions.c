@@ -4,20 +4,9 @@
 /*         Inspired by the example given by J.BOONAERT AMSE 2021-2022                         */
 /*                           Killian ALLAIRE fise2023                                         */
 /*============================================================================================*/
-#include <unistd.h>
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
-#include <ctype.h>
-#include <math.h>
-#include <fcntl.h>
-#include <signal.h>
-#include <errno.h>
-#include <sys/mman.h>
-#include <sys/time.h>
 #include "../../header/Kinematics.h"
 /*&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&*/
-/* initialisation du model */
+/* initialisation du robot */
 /*&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&*/
 Robot initRobot(  double  Te,     // periode d'echantillonnage
                     double  R0,     // rayon commun des roues du robot

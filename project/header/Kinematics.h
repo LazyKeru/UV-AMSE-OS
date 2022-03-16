@@ -1,6 +1,20 @@
 #ifndef KINEMATICS_H_   /* Include guard */
 #define KINEMATICS_H_
 
+/*.........*/
+/* Library */
+/*.........*/
+#include <unistd.h>
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+#include <ctype.h>
+#include <math.h>
+#include <fcntl.h>
+#include <signal.h>
+#include <errno.h>
+#include <sys/mman.h>
+#include <sys/time.h>
 /*............*/
 /* constantes */
 /*............*/

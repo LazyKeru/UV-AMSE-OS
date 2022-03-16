@@ -5,17 +5,6 @@
 /*                           Killian ALLAIRE fise2023                          */
 /*=============================================================================*/
 
-#include <unistd.h>
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
-#include <ctype.h>
-#include <math.h>
-#include <fcntl.h>
-#include <signal.h>
-#include <errno.h>
-#include <sys/mman.h>
-#include <sys/time.h>
 #include "../../header/DCmotor.h"
 
 /*&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&*/
@@ -32,8 +21,7 @@ void usage( char *szPgmName)
 }
 
 /*&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&*/
-/* initialisation des coefficients */
-/* du modele d'etat                */
+/* initialisation du model */
 /*&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&*/
 DCmotor initModel( double R,        /* ->resistance                 */
                 double L,           /* ->inductance                 */

@@ -27,8 +27,21 @@
 
 ## Struct :
 - ./bin : executable
+- ./build : object
 - ./header : contains the h files
 - ./src : contains the c files
+
+## Build project:
+
+```
+make all
+```
+
+## Clean project:
+
+```
+make clean
+```
 
 ## Commit convention
 - BREAKING CHANGE:
