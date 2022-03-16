@@ -1,8 +1,9 @@
-/*===============================*/
-/* regulation PID d'un moteur CC */
-/* ------------------------------*/
-/* J.BOONAERT AMSE 2021-2022     */
-/*===============================*/
+/*============================================================================================*/
+/*                          processus of regulation PID d'un moteur CC                        */
+/*--------------------------------------------------------------------------------------------*/
+/*         Inspired by the example given by J.BOONAERT AMSE 2021-2022                         */
+/*                           Killian ALLAIRE fise2023                                         */
+/*============================================================================================*/
 #include <unistd.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -14,143 +15,12 @@
 #include <errno.h>
 #include <sys/mman.h>
 #include <sys/time.h>
+#include "../../header/RegPID.h"
 /*----------*/
 /* globales */
 /*----------*/
 int     GoOn = 1;           /* ->controle d'execution du processus            */
-int     iCount = 0;         /* ->comptage du nombre d'iterations              */
-double  *lpdb_u;            /* ->pointeur sur la commande                     */
-double  *lpdb_w;            /* ->pointeur sur la vitesse angulaire            */
-double  *lpdb_Tv;           /* ->pointeur sur la consigne de vitesse          */
-double  *lpdb_i;            /* ->pointeur sur le courant                      */
-double  Te;                 /* ->periode d'echantillonnage                    */
-double  e;                  /* ->erreur courante                              */
-double  e_prev;             /* ->erreur passee                                */
-double  De;                 /* ->derivee de l'erreur                          */
-double  Ie;                 /* ->integrale de l'erreur                        */
-double  Ie_prev;            /* ->valeur precedente de l'integrale de l'erreur */
-double  Kcoeff;             /* ->action proportionnelle                       */
-double  Icoeff;             /* ->action integrale                             */
-double  Dcoeff;             /* ->action derivee                               */
-/*--------------*/
-/* declarations */
-/*--------------*/
-void usage( char *);        /* ->aide de ce programme                         */
-void *Link2SharedMem( char *, int, int *, int);
-                            /* ->creation ou lien a une zone de memoire       */
-                            /*   partagee                                     */
-void updateCommand(void);   /* ->mise a jour de la commande du moteur         */
-void SignalHandler(int);    /* ->gestionnaire de signale                      */
-/*-------------*/
-/* definitions */
-/*-------------*/
-/*&&&&&&&&&&&&&&&&&&&&&&*/
-/* aide de ce programme */
-/*&&&&&&&&&&&&&&&&&&&&&&*/
-void usage( char *szPgmName)
-{
-    if( szPgmName == NULL)
-    {
-        exit( -1 );
-    };
-    printf("%s <P> <I> <D> <Periode d'ech.> <drive>\n", szPgmName);
-    printf("   avec <drive> = L | R \n");
-}
-/*&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&*/
-/* creation ou lien a une zone de memoire */
-/* partagee.                              */
-/*&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&*/
-void *Link2SharedMem(   char *szAreaName,           /* ->nom de la zone partagee        */
-                        int iSize,                  /* ->taille de la zone (en octets)  */
-                        int *iFd,                   /* ->descripteur associe a la zone  */
-                        int iCreate            )    /* ->cree la zone (1) si necessaire */
-{
-    void *vAddr;             /* ->pointeur sur la zone partagee creee / liee */
-    /*.......*/
-    /* check */
-    /*.......*/
-    if( szAreaName == NULL )
-    {
-        fprintf(stderr,"Link2SharedMem() : ERREUR ---> pointeur NULL passe en argument #1\n");
-        return( NULL );
-    };
-    if( iFd == NULL )
-    {
-        fprintf(stderr,"Link2SharedMem() : ERREUR ---> pointeur NULL passe en argument #3\n");
-        return( NULL );
-    };
-    /*..................................................*/
-    /* lien a / creation de la zone de memoire partagee */
-    /*..................................................*/
-    if(( *iFd = shm_open(szAreaName, O_RDWR, 0600)) < 0 )
-    {
-        if( iCreate > 0 )
-        {
-            if(( *iFd = shm_open(szAreaName, O_RDWR | O_CREAT, 0600)) < 0)
-            {
-                fprintf(stderr,"Link2SharedMem() :  ERREUR ---> appel a shm_open() pour creation \n");
-                fprintf(stderr,"                    code = %d (%s)\n", errno, (char *)(strerror(errno)));
-                return( NULL );
-            };
-        }
-        else
-        {
-            fprintf(stderr,"Link2SharedMem() :  ERREUR ---> appel a shm_open() pour lien \n");
-            fprintf(stderr,"                    code = %d (%s)\n", errno, (char *)(strerror(errno)));
-            return( NULL );
-        };
-    };
-    /* ajustement de la taille (en octets) */
-    if( ftruncate(*iFd, iSize) < 0 )
-    {
-        fprintf(stderr,"Link2SharedMem() :  ERREUR ---> appel a ftruncate() \n");
-        fprintf(stderr,"                    code = %d (%s)\n", errno, (char *)(strerror(errno)));
-        return( NULL );
-    };
-    /* mapping dans la memoire du processus */
-     if((vAddr = mmap(NULL, iSize, PROT_READ | PROT_WRITE, MAP_SHARED, *iFd, 0)) == MAP_FAILED )
-    {
-        fprintf(stderr,"Link2SharedMem() :  ERREUR ---> appel a mmap() #1\n");
-        fprintf(stderr,"                    code = %d (%s)\n", errno, (char *)(strerror(errno)));
-        return( NULL );
-    };
-    /* fini */
-    return( vAddr );
-}
-/*&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&*/
-/* mise a jour de la commande du moteur */
-/*&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&*/
-void updateCommand( void )
-{
-    double u;       /* ->valeur courante de la commande          */
-    double w;       /* ->valeur courante de la vitesse angulaire */
-    double Tv;      /* ->valeur courante de la consigne          */
-    double u_new;   /* ->nouvelle valeur de la commande          */
-    /* photo.. */
-    u  = *lpdb_u;
-    w  = *lpdb_w;
-    Tv = *lpdb_Tv; 
-    /* init */
-    e = Tv - w;
-    De = (e - e_prev)/Te;
-    Ie = Ie_prev + Te * e;
-    /* calcul */
-    u = Kcoeff * ( e + Icoeff * Ie + Dcoeff * De);
-    /*_________________________________________________________________*/
-#if defined(USR_DBG)
-    if( (iCount % REFRESH_RATE) == 0 )
-    {
-        printf("Te = %lf e = %lf De = %lf Ie = %lf\n", Te, e, De, Ie);
-        printf("u PID = %lf\n", u);
-    };
-     iCount++;
-#endif
-    /*_________________________________________________________________*/
-    /* mise a jour */
-    Ie_prev = Ie;
-    e_prev  = e;
-    *lpdb_u = u;
-}
+PID _pid;                   /* ->PID                                          */
 /*&&&&&&&&&&&&&&&&&&&&&&&&*/
 /* gestionnaire de signal */
 /*&&&&&&&&&&&&&&&&&&&&&&&&*/
@@ -158,7 +28,7 @@ void SignalHandler( int signal )
 {
     if( signal == SIGALRM)
     {
-        updateCommand();
+        updateCommand(&_pid);
     };
 }
 /*######*/
@@ -166,7 +36,16 @@ void SignalHandler( int signal )
 /*######*/
 int main( int argc, char *argv[])
 {
+    /*................................*/
+    /* Arguments needed to be entered */
+    /*................................*/
+    double  Te;                             /* ->periode d'echantillonnage                    */
+    double  Kcoeff;                         /* ->action proportionnelle                       */
+    double  Icoeff;                         /* ->action integrale                             */
+    double  Dcoeff;                         /* ->action derivee                               */
+    double * argAdress[NB_ARGS-1] = {&Kcoeff, &Icoeff, &Dcoeff, &Te};
     char    cDriveID;                       /* ->caractere pour identifier le moteur            */
+
     char    szCmdAreaName[STR_LEN];         /* ->nom de la zone contenant la commande           */
     char    szStateAreaName[STR_LEN];       /* ->nom de la zone contenant l'etat du moteur      */
     char    szTargetAreaName[STR_LEN];      /* ->nom de la zone contenant la consigne           */
@@ -185,41 +64,22 @@ int main( int argc, char *argv[])
     struct sigaction    sa_old;             /* ->gestion du signal handler                      */
     sigset_t            mask;               /* ->liste des signaux a masquer                    */
     struct itimerval    sTime;              /* ->periode du timer                               */
-    /*.......*/
-    /* check */
-    /*.......*/
+    /*.............................*/
+    /*  verification des arguments */
+    /*.............................*/
     if( argc != NB_ARGS)
     {
-        usage(argv[0]);
+        usage( argv[0]);
         return( 0 );
     };
-    /*............................*/
-    /* recuperation des arguments */
-    /*............................*/
-    if( sscanf(argv[1],"%lf",&Kcoeff) == 0 )
+    for (int i = 1; i < argc-1; i++)
     {
-        fprintf(stderr,"%s.main()  : ERREUR ---> l'argument #1 doit etre reel\n", argv[0]);
-        usage(argv[0]);
-        return( 0 );
-    };
-    if( sscanf(argv[2],"%lf",&Icoeff) == 0 )
-    {
-        fprintf(stderr,"%s.main()  : ERREUR ---> l'argument #2 doit etre reel\n", argv[0]);
-        usage(argv[0]);
-        return( 0 );
-    };
-    if( sscanf(argv[3],"%lf",&Dcoeff) == 0 )
-    {
-        fprintf(stderr,"%s.main()  : ERREUR ---> l'argument #3 doit etre reel\n", argv[0]);
-        usage(argv[0]);
-        return( 0 );
-    };
-    if( sscanf(argv[4],"%lf",&Te) == 0 )
-    {
-        fprintf(stderr,"%s.main()  : ERREUR ---> l'argument #4 doit etre reel\n", argv[0]);
-        usage(argv[0]);
-        return( 0 );
-    };
+        if(sscanf(argv[i], "%lf",argAdress[i-1]) == 0){
+            fprintf(stderr,"%s.main()  : ERREUR ---> The #%i argument must be a real number\n", argv[0], i);
+            usage(argv[0]);
+            return( 0 );
+        }
+    }
     if( sscanf(argv[5],"%c",&cDriveID) == 0 )
     {
         fprintf(stderr,"%s.main()  : ERREUR ---> l'argument #8 doit etre un caractere\n", argv[0]);
@@ -227,11 +87,14 @@ int main( int argc, char *argv[])
         return( 0 );
     };
     printf("Kcoeff = %lf\tIcoeff = %lf\tDcoeff = %lf\n", Kcoeff, Icoeff, Dcoeff);
+
+    _pid = initPID( Te,  Kcoeff,  Icoeff,  Dcoeff);
+
     /*................................................*/
     /* lien / creation aux zones de memoire partagees */
     /*................................................*/
     sprintf(szCmdAreaName,"%s%c", CMD_BASENAME, cDriveID);
-    if( (lpdb_u = (double *)(Link2SharedMem(szCmdAreaName, sizeof(double), &iFdCmd, 1 ))) == NULL )
+    if( (_pid.lpdb_u = (double *)(Link2SharedMem(szCmdAreaName, sizeof(double), &iFdCmd, 1 ))) == NULL )
     {
         fprintf(stderr,"%s.main()  : ERREUR ---> appel a Link2SharedMem() #1\n", argv[0]);
         return( 0 );
@@ -242,23 +105,23 @@ int main( int argc, char *argv[])
         fprintf(stderr,"%s.main()  : ERREUR ---> appel a Link2SharedMem() #2\n", argv[0]);
         return( 0 );
     };
-    lpdb_w = &lpdb_state[OFFSET_W];
-    lpdb_i = &lpdb_state[OFFSET_I];
+    _pid.lpdb_w = &lpdb_state[OFFSET_W];
+    _pid.lpdb_i = &lpdb_state[OFFSET_I];
     sprintf(szTargetAreaName,"%s%c", TARGET_BASENAME, cDriveID);
-    if( (lpdb_Tv = (double *)(Link2SharedMem(szTargetAreaName, sizeof(double), &iFdTarget, 1 ))) == NULL )
+    if( (_pid.lpdb_Tv = (double *)(Link2SharedMem(szTargetAreaName, sizeof(double), &iFdTarget, 1 ))) == NULL )
     {
         fprintf(stderr,"%s.main()  : ERREUR ---> appel a Link2SharedMem() #3\n", argv[0]);
         return( 0 );
     };
-    *lpdb_Tv = 0.0;
+    *_pid.lpdb_Tv = 0.0;
     /*.................*/
     /* initialisations */
     /*.................*/
-    e       = 0.0;
-    e_prev  = 0.0;
-    Ie      = 0.0;
-    Ie_prev = 0.0;
-    De      = 0.0;
+    _pid.e       = 0.0;
+    _pid.e_prev  = 0.0;
+    _pid.Ie      = 0.0;
+    _pid.Ie_prev = 0.0;
+    _pid.De      = 0.0;
     /*............................................*/
     /* installation de la routine d'interception  */
     /*............................................*/
@@ -295,14 +158,14 @@ int main( int argc, char *argv[])
     {
         pause();
         /*___________________________________________________*/
-#if defined(USR_DBG)
-        if( (iLoops % (int)(REFRESH_RATE)) == 0)
-        {
-            printf("Tv = %lf w = %lf \n", *lpdb_Tv, *lpdb_w);
-        };
-        iLoops++;
+        #if defined(USR_DBG)
+                if( (iLoops % (int)(REFRESH_RATE)) == 0)
+                {
+                    printf("Tv = %lf w = %lf \n", *lpdb_Tv, *lpdb_w);
+                };
+                iLoops++;
+        #endif
         /*___________________________________________________*/
-#endif
     }
-    return( 0 );   
+    return( 0 );
 }

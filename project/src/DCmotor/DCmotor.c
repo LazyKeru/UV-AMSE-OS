@@ -87,6 +87,12 @@ int main( int argc, char *argv[])
             return( 0 );
         }
     }
+    if( sscanf(argv[NB_ARGS-1],"%c",&cDriveID) == 0 )
+    {
+        fprintf(stderr,"%s.main()  : ERREUR ---> l'argument #8 doit etre un caractere\n", argv[0]);
+        usage(argv[0]);
+        return( 0 );
+    };
     /*.....................*/
     /* Creating the modele */
     /*.....................*/

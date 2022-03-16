@@ -9,9 +9,11 @@ BUILD_DIR := ./build/
 ## CPP location
 DCMOTOR_LIST := $(wildcard ${SRC_DIR}DCmotor/*.c)
 KINEMATICS_LIST := $(wildcard ${SRC_DIR}Kinematics/*.c)
+REGPID_LIST := $(wildcard ${SRC_DIR}RegPID/*.c)
 ## Object location
 OBJ_DCMOTOR_LIST := $(addprefix $(BUILD_DIR), $(notdir $(DCMOTOR_LIST:.c=.o)))
 OBJ_KINEMATICS_LIST := $(addprefix $(BUILD_DIR), $(notdir $(KINEMATICS_LIST:.c=.o)))
+OBJ_REGPID_LIST := $(addprefix $(BUILD_DIR), $(notdir $(REGPID_LIST:.c=.o)))
 
 # Looking at the OS to define or RM function 
 ifdef OS
@@ -31,13 +33,16 @@ CXX := gcc
 LD := gcc
 
 
-all: DCmotor.exe Kinematics.exe
+all: DCmotor.exe Kinematics.exe RegPID.exe
 
 DCmotor.exe: $(OBJ_DCMOTOR_LIST)
 	${LD} $(LDFLAGS) $(OBJ_DCMOTOR_LIST) -o $(BIN_DIR)$@ $(LIBRARY)
 
 Kinematics.exe: $(OBJ_KINEMATICS_LIST)
 	${LD} $(LDFLAGS) $(OBJ_KINEMATICS_LIST) -o $(BIN_DIR)$@ $(LIBRARY)
+
+RegPID.exe: $(OBJ_REGPID_LIST)
+	${LD} $(LDFLAGS) $(OBJ_REGPID_LIST) -o $(BIN_DIR)$@ $(LIBRARY)
 
 # Compile the c files
 ${BUILD_DIR}%.o: ${SRC_DIR}*/%.c
