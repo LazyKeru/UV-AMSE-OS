@@ -12,12 +12,14 @@ KINEMATICS_LIST := $(wildcard ${SRC_DIR}Kinematics/*.c)
 REGPID_LIST := $(wildcard ${SRC_DIR}RegPID/*.c)
 SETU_LIST := $(wildcard ${SRC_DIR}SetU/*.c)
 SETTV_LIST := $(wildcard ${SRC_DIR}SetTv/*.c)
+ODOMETRY_LIST := $(wildcard ${SRC_DIR}Odometry/*.c)
 ## Object location
 OBJ_DCMOTOR_LIST := $(addprefix $(BUILD_DIR), $(notdir $(DCMOTOR_LIST:.c=.o)))
 OBJ_KINEMATICS_LIST := $(addprefix $(BUILD_DIR), $(notdir $(KINEMATICS_LIST:.c=.o)))
 OBJ_REGPID_LIST := $(addprefix $(BUILD_DIR), $(notdir $(REGPID_LIST:.c=.o)))
 OBJ_SETU_LIST := $(addprefix $(BUILD_DIR), $(notdir $(SETU_LIST:.c=.o)))
 OBJ_SETTV_LIST := $(addprefix $(BUILD_DIR), $(notdir $(SETTV_LIST:.c=.o)))
+OBJ_ODOMETRY_LIST := $(addprefix $(BUILD_DIR), $(notdir $(SETTV_LIST:.c=.o)))
 
 # Looking at the OS to define or RM function 
 ifdef OS
@@ -37,7 +39,7 @@ CXX := gcc
 LD := gcc
 
 
-all: DCmotor.exe Kinematics.exe RegPID.exe SetU.exe SetTv.exe
+all: DCmotor.exe Kinematics.exe RegPID.exe SetU.exe SetTv.exe Odometry.exe
 
 DCmotor.exe: $(OBJ_DCMOTOR_LIST)
 	${LD} $(LDFLAGS) $(OBJ_DCMOTOR_LIST) -o $(BIN_DIR)$@ $(LIBRARY)
@@ -53,6 +55,9 @@ SetU.exe: $(OBJ_SETU_LIST)
 
 SetTv.exe: $(OBJ_SETTV_LIST)
 	${LD} $(LDFLAGS) $(OBJ_SETTV_LIST) -o $(BIN_DIR)$@ $(LIBRARY)
+
+Odometry.exe: $(OBJ_ODOMETRY_LIST)
+	${LD} $(LDFLAGS) $(OBJ_ODOMETRY_LIST) -o $(BIN_DIR)$@ $(LIBRARY)
 
 # Compile the c files
 ${BUILD_DIR}%.o: ${SRC_DIR}*/%.c

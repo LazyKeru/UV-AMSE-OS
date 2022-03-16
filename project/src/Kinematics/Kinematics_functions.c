@@ -37,8 +37,7 @@ void usage( char *szPgmName)
     {
         exit( -1 );
     };
-    printf("%s <R0> <W> <Periode d'ech.> <drive>\n", szPgmName);
-    printf("   avec <drive> = L | R \n");
+    printf("%s <R0> <W> <Periode d'ech.>\n", szPgmName);
 }
 
 /*&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&*/

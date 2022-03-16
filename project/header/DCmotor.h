@@ -26,7 +26,6 @@
 #define OFFSET_I        1               /* ->offset sur la zone d'etat pour acceder a l'intensite                        */
 #define STR_LEN         64              /* ->taille des chaines par defaut    
 
-
 /*********************/
 /** Struct_DCmotor  **/
 /*********************/
