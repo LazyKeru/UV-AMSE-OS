@@ -1,49 +1,16 @@
-/*===================================*/
-/* utilitaire pour imposer la valeur */
-/* de la consigne a un moteur        */
-/* ----------------------------------*/
-/* J.BOONAERT AMSE 2021-2022         */
-/*===================================*/
-#include <unistd.h>
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
-#include <ctype.h>
-#include <math.h>
-#include <fcntl.h>
-#include <signal.h>
-#include <errno.h>
-#include <sys/mman.h>
-#include <sys/time.h>
-/*............*/
-/* constantes */
-/*............*/
-#define TARGET_BASENAME    "TARGET_"
-#define NB_ARGS             3               /* ->nombre d'arguments a passer en ligne de commande                            */
-#define STR_LEN             64              /* ->taille des chaines par defaut                                               */
+/*============================================================================================*/
+/*                          Set Tv for selected motor                                         */
+/*--------------------------------------------------------------------------------------------*/
+/*         Inspired by the example given by J.BOONAERT AMSE 2021-2022                         */
+/*                           Killian ALLAIRE fise2023                                         */
+/*============================================================================================*/
+
+#include "../../header/SetTv.h"
+
 /*----------*/
 /* globales */
 /*----------*/
 double *lpdb_Tv;            /* ->pointeur sur la commande          */
-/*--------------*/
-/* declarations */
-/*--------------*/
-void usage( char *);        /* ->aide de ce programme              */
-/*-------------*/
-/* definitions */
-/*-------------*/
-/*&&&&&&&&&&&&&&&&&&&&&&*/
-/* aide de ce programme */
-/*&&&&&&&&&&&&&&&&&&&&&&*/
-void usage( char *szPgmName)
-{
-    if( szPgmName == NULL)
-    {
-        exit( -1 );
-    };
-    printf("%s <consigne> <drive>\n", szPgmName);
-    printf("   avec <drive> = L | R \n");
-}
 /*######*/
 /* MAIN */
 /*######*/

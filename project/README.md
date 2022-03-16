@@ -33,11 +33,15 @@
 
 ## Build project:
 
+run in this dir
+
 ```
 make all
 ```
 
 ## Clean project:
+
+run in this dir
 
 ```
 make clean
