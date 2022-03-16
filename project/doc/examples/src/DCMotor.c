@@ -308,14 +308,14 @@ int main( int argc, char *argv[])
     {
         pause();
         /*_________________________________________________________________*/
-#if defined(USR_DBG)
+        #if defined(USR_DBG)
         if( (iLoops % (int)(REFRESH_RATE)) == 0)
         {
             printf("u = %lf w = %lf i = %lf\n", *lpdb_u, *lpdb_w, *lpdb_i);
         };
         iLoops++;
         /*_________________________________________________________________*/
-#endif
+        #endif
     }
     return( 0 );   
 }
