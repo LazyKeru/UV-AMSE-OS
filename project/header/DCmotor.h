@@ -20,21 +20,38 @@ typedef struct DCmotor{
     /**   Will change   **/
     /*********************/
     double Tv; // Vitesse de la roue
-    double u; // Commandes appliquées aux moteurs respectivemennts
-    double i; // Courant du moteur
-    double w; // Vitesse angulaire
+    double * u; // adresse de la Commandes appliquées aux moteurs respectivemennts
+    double * i; // adresse du Courant du moteur
+    double * w; // adresse de la Vitesse angulaire
 } DCmotor;
+
+
+
+/*&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&*/
+/* Help for starting the motor Processus */
+/*&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&*/
+void usage( char *szPgmName);
 
 /*********************/
 /**    initModel    **/
 /*********************/
-DCmotor initModel( double R,           /* ->resistance                 */
+DCmotor initModel( double R,        /* ->resistance                 */
                 double L,           /* ->inductance                 */
                 double Ke,          /* ->constante electrique       */
                 double Km,          /* ->constante moteur           */
                 double f,           /* ->coefficient de frottements */
                 double J,           /* ->inertie totale             */
-                double Te   );       /* ->periode d'echantilonnage   */
+                double Te          /* ->periode d'echantilonnage   */
+                );
 
+/*&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&*/
+/* mise a jour de l'etat du moteur */
+/*&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&*/
+void updateState(DCmotor * dcmotor);
+
+/*&&&&&&&&&&&&&&&&&&&&&&&&*/
+/* gestionnaire de signal */
+/*&&&&&&&&&&&&&&&&&&&&&&&&*/
+void SignalHandler( int signal);
 
 #endif // DCMOTOR_H_

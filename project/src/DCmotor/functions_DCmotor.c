@@ -5,11 +5,18 @@
 /*                           Killian ALLAIRE fise2023                          */
 /*=============================================================================*/
 
+#include <unistd.h>
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 #include <ctype.h>
 #include <math.h>
-#include "DCmotor.h"
+#include <fcntl.h>
+#include <signal.h>
+#include <errno.h>
+#include <sys/mman.h>
+#include <sys/time.h>
+#include "../../header/DCmotor.h"
 
 /*&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&*/
 /* Help for starting the motor Processus */
@@ -24,16 +31,18 @@ void usage( char *szPgmName)
     printf("   with <drive> = L | R \n");
 }
 
-/*&&&&&&&&&&&&&&&&&&&&&&*/
-/* aide de ce programme */
-/*&&&&&&&&&&&&&&&&&&&&&&*/
-DCmotor initModel( double R,           /* ->resistance                 */
+/*&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&*/
+/* initialisation des coefficients */
+/* du modele d'etat                */
+/*&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&*/
+DCmotor initModel( double R,        /* ->resistance                 */
                 double L,           /* ->inductance                 */
                 double Ke,          /* ->constante electrique       */
                 double Km,          /* ->constante moteur           */
                 double f,           /* ->coefficient de frottements */
                 double J,           /* ->inertie totale             */
-                double Te   )       /* ->periode d'echantilonnage   */
+                double Te          /* ->periode d'echantilonnage   */
+                )
 {
     DCmotor res;
     /***********************************/
@@ -49,9 +58,32 @@ DCmotor initModel( double R,           /* ->resistance                 */
     /***********************************/
     /** Var - Will have a get and set **/
     /***********************************/
-    res.i;
-    res.Tv;
-    res.u;
-    res.w;
+    //double * i, * u, * w;
+    //res.i = i;
+    //res.Tv;
+    //res.u = u;
+    //res.w = w;
     return res;
+}
+
+/*&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&*/
+/* mise a jour de l'etat du moteur */
+/*&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&*/
+void updateState(DCmotor * dcmotor)
+{
+    /* Taking the old value */
+    double u = (double) *(dcmotor->u);
+    double i = (double) *(dcmotor->i);
+    double w = (double) *(dcmotor->w);
+    /*....................................................*/
+    /*  Motor current update - cst, should move elsewhere */
+    /*....................................................*/
+    // given to us by the teacher
+    double z0 = exp(-(dcmotor->Te * dcmotor->R / dcmotor->L));  /* ->coeff. pour la recurrence */
+    double b0 = (1 / dcmotor->R) * (1 - z0);                    /* ->coeff. pour la recurrence */
+    double z1 = exp(-(dcmotor->Te * dcmotor->f / dcmotor->J));  /* ->coeff. pour la recurrence */
+    double b1 = (dcmotor->Km / dcmotor->f) * (1 - z1);          /* ->coeff. pour la recurrence */
+    /* updating their value */
+    *(dcmotor->i) = (double) (z0 * i + -dcmotor->Ke*b0 * w + b1 * u);
+    *(dcmotor->w) = (double) (b1 * i + z1 * w);
 }

@@ -7,9 +7,9 @@ BUILD_DIR := ./build/
 
 # Location of cpp files and object list
 ## CPP location
-DCMOTOR_LIST := $(wildcard ${SRC_DIR}DCMOTOR/*.c)
+DCMOTOR_LIST := $(wildcard ${SRC_DIR}DCmotor/*.c)
 ## Object location
-OBJ_DCMOTOR_LIST := $(addprefix $(BUILD_DIR), $(notdir $(MAIN_LIST:.c=.o)))
+OBJ_DCMOTOR_LIST := $(addprefix $(BUILD_DIR), $(notdir $(DCMOTOR_LIST:.c=.o)))
 
 # Looking at the OS to define or RM function 
 ifdef OS
@@ -21,14 +21,15 @@ else
 endif
 
 # Variables for tools
-CXXFLAGS:= -Wall -g -std=c++17
-LDFLAGS:= -Wall -g -std=c++17
+CXXFLAGS:= -Wall
+LDFLAGS:= -Wall
+LIBRARY:= -lrt -lm
 INCLUDES:= -I${INC_DIR}
-CXX := g++
-LD := g++
+CXX := gcc
+LD := gcc
 
-DCmotor: $(DCMOTOR_LIST)
-	${LD} $(LDFLAGS) $(OBJ_DCMOTOR_LIST) -o $(BIN_DIR)$@
+DCmotor: $(OBJ_DCMOTOR_LIST)
+	${LD} $(LDFLAGS) $(OBJ_DCMOTOR_LIST) -o $(BIN_DIR)$@ $(LIBRARY)
 
 # Compile the c files
 ${BUILD_DIR}%.o: ${SRC_DIR}*/%.c
