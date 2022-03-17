@@ -11,7 +11,7 @@
 /* globales */
 /*----------*/
 int     GoOn = 1;           /* ->controle d'execution du processus             */
-Orientation _orientation;
+Cordonne _cordonne;
 /*&&&&&&&&&&&&&&&&&&&&&&&&*/
 /* gestionnaire de signal */
 /*&&&&&&&&&&&&&&&&&&&&&&&&*/
@@ -19,7 +19,7 @@ void SignalHandler( int signal )
 {
     if( signal == SIGALRM)
     {
-        updateOrientation(&_orientation);
+        updateOrientation(&_cordonne);
     };
 }
 /*######*/
@@ -36,15 +36,13 @@ int main( int argc, char *argv[])
     /*.................*/
     /* other Arguments */
     /*.................*/
-    int     iFdStateL;                      /* ->descripteur pour la zone d'etat moteur gauche                */
-    int     iFdStateR;                      /* ->descripteur pour la zone d'etat moteur droit                 */
-    int     iFdVelocity;                    /* ->descripteur pour la zone des vitesses                        */
-    int     iLoops = 0;                     /* ->compte le nombre d'iterations effectuees                     */
     struct sigaction    sa;                 /* ->gestion du signal handler                                    */
     struct sigaction    sa_old;             /* ->gestion du signal handler                                    */
     sigset_t            mask;               /* ->liste des signaux a masquer                                  */
     struct itimerval    sTime;              /* ->periode du timer                                             */
-    double  * cordonne;                     /* ->pointeur sur la zone partagee des cordonne    */
+    double  * cordonne;                     /* ->pointeur sur la zone partagee des cordonne                   */
+    int     iFdStateCordonne;               /* ->descripteur pour la zone partagee des cordonne               */
+    int     iFdVelocity;                    /* ->descripteur pour la zone des vitesses                        */
     /*.......*/
     /* check */
     /*.......*/
@@ -72,27 +70,27 @@ int main( int argc, char *argv[])
     /*............*/
     /* Init robot */
     /*............*/
-    _orientation = initOrientation(Te);
+    _cordonne = initCordonne(Te);
     /*................................................*/
     /* lien / creation aux zones de memoire partagees */
     /*................................................*/
-    if( (_orientation.lpdb_vel = (double *)(Link2SharedMem(VELOCITY, 2 * sizeof(double), &iFdVelocity, 1 ))) == NULL )
+    if( (_cordonne.lpdb_vel = (double *)(Link2SharedMem(VELOCITY, 2 * sizeof(double), &iFdVelocity, 1 ))) == NULL )
     {
         fprintf(stderr,"%s.main()  : ERREUR ---> appel a Link2SharedMem() #3\n", argv[0]);
         return( 0 );
     };
-    if( (cordonne = (double *)(Link2SharedMem(VELOCITY, 3 * sizeof(double), &iFdVelocity, 1 ))) == NULL )
+    if( (cordonne = (double *)(Link2SharedMem(CORDONNE, 3 * sizeof(double), &iFdStateCordonne, 1 ))) == NULL )
     {
         fprintf(stderr,"%s.main()  : ERREUR ---> appel a Link2SharedMem() #3\n", argv[0]);
         return( 0 );
     };
-    _orientation.x = &cordonne[OFFSET_X];
-    _orientation.y = &cordonne[OFFSET_Y];
-    _orientation.O = &cordonne[OFFSET_O];
+    _cordonne.x = &cordonne[OFFSET_X];
+    _cordonne.y = &cordonne[OFFSET_Y];
+    _cordonne.O = &cordonne[OFFSET_O];
     /*.................*/
     /* initialisations */
     /*.................*/
-    setCord(startingX, startingY, starting0, &_orientation);
+    setCord(startingX, startingY, starting0, &_cordonne);
     /*............................................*/
     /* installation de la routine d'interception  */
     /*............................................*/

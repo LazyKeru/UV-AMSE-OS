@@ -10,10 +10,10 @@
 /*&&&&&&&&&&&&*/
 /* init robot */
 /*&&&&&&&&&&&&*/
-Orientation initOrientation( 
+Cordonne initCordonne( 
     double  Te // periode d'echantillonnage                  
 ){
-    Orientation res;
+    Cordonne res;
     res.Te = Te;
     return res;
 };
@@ -95,19 +95,19 @@ void *Link2SharedMem(   char *szAreaName,           /* ->nom de la zone partagee
 /*&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&*/
 /* mise a jour des vitesses au centre cinematique */
 /*&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&*/
-void updateOrientation( Orientation * orientation ){
+void updateOrientation( Cordonne * cordonne ){
     /* Old values */
-    double _x = (double) *(orientation->x);
+    double _x = (double) *(cordonne->x);
     double _y;
     double _O;
-    double _Te = (double) orientation->Te;
-    double _vc = (double) (orientation->lpdb_vel[OFFSET_VC]);
-    double _wc = (double) (orientation->lpdb_vel[OFFSET_WC]);
+    double _Te = (double) cordonne->Te;
+    double _vc = (double) (cordonne->lpdb_vel[OFFSET_VC]);
+    double _wc = (double) (cordonne->lpdb_vel[OFFSET_WC]);
     /* Updating values */
-    *(orientation->x) = _x - _vc * _Te * sin(_O);
-    *(orientation->y) = _y + _vc * _Te * cos(_O);
-    *(orientation->O) = _O * _Te * _wc;
-    printf("The new cords x : %f ; y : %f ; O : %f ; \n", *(orientation->x), *(orientation->y), *(orientation->O));
+    *(cordonne->x) = _x - _vc * _Te * sin(_O);
+    *(cordonne->y) = _y + _vc * _Te * cos(_O);
+    *(cordonne->O) = _O * _Te * _wc;
+    printf("The new cords x : %f ; y : %f ; O : %f ; \n", *(cordonne->x), *(cordonne->y), *(cordonne->O));
 }
 
 /*&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&*/
@@ -117,9 +117,9 @@ void setCord(
     double startingX, 
     double startingY, 
     double starting0, 
-    Orientation * orientation
+    Cordonne * cordonne
 ){
-    *orientation->x = startingX;
-    *orientation->y = startingY;
-    *orientation->O = starting0;
+    *cordonne->x = startingX;
+    *cordonne->y = startingY;
+    *cordonne->O = starting0;
 }

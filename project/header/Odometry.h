@@ -20,6 +20,7 @@
 /* constantes */
 /*............*/
 #define VELOCITY            "VELOCITY"  /* ->nom de la zone partagee pour les vitesses lineaire et angulaire             */
+#define CORDONNE            "CORDONNE"  /* ->nom de la zone partagee pour les vitesses lineaire et angulaire             */
 #define NB_ARGS         5               /* ->nombre d'arguments a passer en ligne de commande                            */
 #define REFRESH_RATE    5               /* ->nombre d'iterations a realiser pour 1 affichage de l'etat et de la commande */
 #define OFFSET_VC       0               /* ->offset sur la zone d'etat pour acceder a la vitesse angulaire               */
@@ -29,9 +30,9 @@
 #define OFFSET_Y        1               /* ->offset sur la zone de cordonne pour a Y                                                   */
 #define OFFSET_O        2               /* ->offset sur la zone de cordonne pour son orientation O               */
 /*********************/
-/** Struct_Orientation  **/
+/** Struct_Cordonne  **/
 /*********************/
-typedef struct Orientation{
+typedef struct Cordonne{
     /*********************/
     /** Will not change **/
     /*********************/
@@ -46,12 +47,12 @@ typedef struct Orientation{
     double * x;    // abscisse robot
     double * y;    // ordonnee robot
     double * O;    // orientation robot
-} Orientation;
+} Cordonne;
 
 /*&&&&&&&&&&&&*/
 /* init robot */
 /*&&&&&&&&&&&&*/
-Orientation initOrientation( double  Te ); // periode d'echantillonnage
+Cordonne initCordonne( double  Te ); // periode d'echantillonnage
 
 /*&&&&&&&&&&&&&&&&&&&&&&*/
 /* aide de ce programme */
@@ -70,7 +71,7 @@ void *Link2SharedMem(   char *szAreaName,           /* ->nom de la zone partagee
 /*&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&*/
 /* mise a jour des vitesses au centre cinematique */
 /*&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&*/
-void updateOrientation( Orientation * orientation );
+void updateOrientation( Cordonne * cordonne );
 /*&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&*/
 /* SettingCord */
 /*&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&*/
@@ -78,7 +79,7 @@ void setCord(
     double startingX, 
     double startingY, 
     double starting0, 
-    Orientation * orientation
+    Cordonne * cordonne
 );
 
 #endif // DCMOTOR_H_
