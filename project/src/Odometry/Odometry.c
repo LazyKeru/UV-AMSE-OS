@@ -43,14 +43,6 @@ int main( int argc, char *argv[])
     double  * cordonne;                     /* ->pointeur sur la zone partagee des cordonne                   */
     int     iFdStateCordonne;               /* ->descripteur pour la zone partagee des cordonne               */
     int     iFdVelocity;                    /* ->descripteur pour la zone des vitesses                        */
-    /*.......*/
-    /* check */
-    /*.......*/
-    if( argc != NB_ARGS)
-    {
-        usage(argv[0]);
-        return( 0 );
-    };
     /*.............................*/
     /*  verification des arguments */
     /*.............................*/
@@ -63,7 +55,7 @@ int main( int argc, char *argv[])
     {
         if(sscanf(argv[i], "%lf",argAdress[i-1]) == 0){
             fprintf(stderr,"%s.main()  : ERREUR ---> The #%i argument must be a real number\n", argv[0], i);
-            usage(argv[0]);
+            usage( argv[0]);
             return( 0 );
         }
     }

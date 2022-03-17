@@ -74,4 +74,5 @@ void updateState(DCmotor * dcmotor)
     /* updating their value */
     *(dcmotor->i) = (double) (z0 * i + -dcmotor->Ke*b0 * w + b1 * u);
     *(dcmotor->w) = (double) (b1 * i + z1 * w);
+    printf("The new i of dcmotor : %f ; The new w of dcmotor : %f ;\n", *(dcmotor->i), *(dcmotor->w));
 }

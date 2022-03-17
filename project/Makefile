@@ -19,7 +19,7 @@ OBJ_KINEMATICS_LIST := $(addprefix $(BUILD_DIR), $(notdir $(KINEMATICS_LIST:.c=.
 OBJ_REGPID_LIST := $(addprefix $(BUILD_DIR), $(notdir $(REGPID_LIST:.c=.o)))
 OBJ_SETU_LIST := $(addprefix $(BUILD_DIR), $(notdir $(SETU_LIST:.c=.o)))
 OBJ_SETTV_LIST := $(addprefix $(BUILD_DIR), $(notdir $(SETTV_LIST:.c=.o)))
-OBJ_ODOMETRY_LIST := $(addprefix $(BUILD_DIR), $(notdir $(SETTV_LIST:.c=.o)))
+OBJ_ODOMETRY_LIST := $(addprefix $(BUILD_DIR), $(notdir $(ODOMETRY_LIST:.c=.o)))
 
 # Looking at the OS to define or RM function 
 ifdef OS

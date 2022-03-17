@@ -126,4 +126,5 @@ void updateCommand(PID * pid)
     pid->Ie_prev = pid->Ie;
     pid->e_prev  = pid->e;
     *pid->lpdb_u = u;
+    printf("The new u : %f ;\n", *pid->lpdb_u);
 }

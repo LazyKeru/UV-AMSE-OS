@@ -127,6 +127,7 @@ void updateVelocity(Robot * robot)
     #endif
     /*_________________________________________________________________*/
     /* mise a jour */
-    robot->wG[OFFSET_VC] = Vc;
-    robot->wG[OFFSET_WC] = Wc;
+    robot->wG[OFFSET_VC] = (double) Vc;
+    robot->wG[OFFSET_WC] = (double) Wc;
+    printf("The new Vitesse angulaire : %f ; The new Vitesse lineaire : %f ;\n", robot->wG[OFFSET_VC], robot->wG[OFFSET_WC]);
 }
